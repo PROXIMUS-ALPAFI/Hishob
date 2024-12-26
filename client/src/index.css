@@ -1,0 +1,30 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+.content{
+    height: 85vh;
+}
+/* .navbar{
+    background: #1d98a689 !important;
+} */
+ .registerp{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+ }
+ .loginp{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+ }
+ .filters{
+    display: flex;
+    align-items:center ;
+    justify-content: space-between;
+    padding: 15px 20px;
+    box-shadow: 0 0 3px grey;
+}
