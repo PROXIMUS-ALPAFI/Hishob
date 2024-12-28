@@ -1,81 +1,182 @@
-import React,{useState} from 'react'
-import  { message,Form, Input,  Modal, Select} from 'antd'
-import Layout from '../components/layouts/layout'
-import axios from 'axios'
-import Loading from '../components/loading'
-
+import React, { useState, useEffect } from 'react';
+import { message, Form, Input, Modal, Select, Table, DatePicker } from 'antd';
+import Layout from '../components/layouts/layout';
+import axios from 'axios';
+import Loading from '../components/loading';
+import './main.css'
+import moment from 'moment';
+const { RangePicker } = DatePicker;
 
 const Homepage = () => {
-    const [showModal,setShowModal]=useState(false)
-    const [loading,setLoading]=useState(false)
-    const handlesubmit=async(value)=>{
-        try {
-            const user = JSON.parse(localStorage.getItem('user'))
-            setLoading(true)
-            await axios.post("/transactions/addts",
-                {...value,
-                     userid:user._id,
+    const [showModal, setShowModal] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [allts, setallts] = useState([]);
+    const [frequency, setFrequency] = useState('7');
+    const [selectDate, setselectDate] = useState([]);
+    const [type,setype]=useState('ALL')
+
+    // Table columns
+    const column = [
+        {
+            title: 'Date',
+            dataIndex: 'date',
+            render: (text) => <span>{moment(text).format('YYYY-MM-DD')}</span>,
+        },
+        {
+            title: 'Amount',
+            dataIndex: 'amount',
+        },
+        {
+            title: 'Type',
+            dataIndex: 'type',
+        },
+        {
+            title: 'Category',
+            dataIndex: 'category',
+        },
+        {
+            title: 'Description',
+            dataIndex: 'description',
+        },
+        {
+            title: 'Reference',
+            dataIndex: 'reference',
+        },
+        {
+            title: 'Action',
+        },
+    ];
+
+    // Fetch transactions
+    useEffect(() => {
+        const getallts = async () => {
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                setLoading(true);
+                const res = await axios.post('/transactions/getts', {
+                    userid: user._id,
+                    frequency,
+                    selectDate,
+                    type
                 });
+                setLoading(false);
+                setallts(res.data);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        getallts();
+    }, [frequency, selectDate,type]);
+
+    // Form submission
+    const handlesubmit = async (value) => {
+        try {
+            const user = JSON.parse(localStorage.getItem('user'));
+            setLoading(true);
+            await axios.post('/transactions/addts', {
+                ...value,
+                userid: user._id,
+            });
             message.success('Transaction Loaded Successfully');
-            setLoading(false)
-            
-            setShowModal(false)
+            setLoading(false);
+            setShowModal(false);
         } catch (error) {
-            setLoading(false)
-            message.error('Something went wrong')
+            setLoading(false);
+            message.error('Something went wrong');
         }
-    }
+    };
+
+    // Row class name logic
+    const rowClassName = (record) => {
+        return record.type === 'Income' ? 'row-income' : 'row-expense';
+    };
+
     return (
         <Layout>
-            {loading && <Loading/>}
-            <div className='filters'>
-                <div>range filters</div>
-                <div><button className='btn btn-primary' onClick={()=>setShowModal(true)}>Add New</button></div>
+            {loading && <Loading />}
+            <div className="filters">
+                <div>
+                    <h6>Select Frequency</h6>
+                    <Select value={frequency} onChange={(values) => setFrequency(values)}>
+                        <Select.Option value="7">This Week</Select.Option>
+                        <Select.Option value="30">This Month</Select.Option>
+                        <Select.Option value="365">This Year</Select.Option>
+                        <Select.Option value="custom">Custom</Select.Option>
+                    </Select>
+                    {frequency === 'custom' && (
+                        <RangePicker value={selectDate} onChange={(values) => setselectDate(values)} />
+                    )}
+                </div>
+                <div>
+                    <h6>Select Type</h6>
+                    <Select value={type} onChange={(values) => setype(values)}>
+                    <Select.Option value="ALL">All</Select.Option>
+                        <Select.Option value="Income">Income</Select.Option>
+                        <Select.Option value="Expense">Expense</Select.Option>
+                    </Select>
+                </div>
+                <div>
+                    <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+                        Add New
+                    </button>
+                </div>
             </div>
-            <div className='content'></div>
-            <Modal title='Add Transaction' open={showModal} onCancel={()=>setShowModal(false)} footer={false}>
-                <Form layout='vertical' onFinish={handlesubmit} >
-                    <Form.Item label='Amount' name='amount'>
-                        <Input type='text'/>
+            <div className="content">
+                <Table
+                    columns={column}
+                    dataSource={allts}
+                    rowClassName={rowClassName}
+                />
+            </div>
+            <Modal
+                title="Add Transaction"
+                open={showModal}
+                onCancel={() => setShowModal(false)}
+                footer={false}
+            >
+                <Form layout="vertical" onFinish={handlesubmit}>
+                    <Form.Item label="Amount" name="amount">
+                        <Input type="text" />
                     </Form.Item>
-                    <Form.Item label='type' name='type'>
+                    <Form.Item label="Type" name="type">
                         <Select>
-                            <Select.Option value='Income'>Income</Select.Option>
-                            <Select.Option value='Expense'>Expense</Select.Option>
+                            <Select.Option value="Income">Income</Select.Option>
+                            <Select.Option value="Expense">Expense</Select.Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item label='Category' name='category'>
+                    <Form.Item label="Category" name="category">
                         <Select>
-                            <Select.Option value='Salary'></Select.Option>
-                            <Select.Option value='Food'></Select.Option>
-                            <Select.Option value='Fees'></Select.Option>
-                            <Select.Option value='Utility Bills'></Select.Option>
-                            <Select.Option value='Entertainment'></Select.Option>
-                            <Select.Option value='Groceries'></Select.Option>
-                            <Select.Option value='Toileteries'></Select.Option>
-                            <Select.Option value='Healthcare'></Select.Option>
-                            <Select.Option value='Gift'></Select.Option>
-                            <Select.Option value='tax'></Select.Option>
+                            <Select.Option value="Salary">Salary</Select.Option>
+                            <Select.Option value="Food">Food</Select.Option>
+                            <Select.Option value="Fees">Fees</Select.Option>
+                            <Select.Option value="Utility Bills">Utility Bills</Select.Option>
+                            <Select.Option value="Entertainment">Entertainment</Select.Option>
+                            <Select.Option value="Groceries">Groceries</Select.Option>
+                            <Select.Option value="Toiletries">Toiletries</Select.Option>
+                            <Select.Option value="Healthcare">Healthcare</Select.Option>
+                            <Select.Option value="Gift">Gift</Select.Option>
+                            <Select.Option value="Tax">Tax</Select.Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item label='Description' name='description'>
-                        <Input type='text'/>
+                    <Form.Item label="Description" name="description">
+                        <Input type="text" />
                     </Form.Item>
-                    <Form.Item label='Reference' name='reference'>
-                        <Input type='text'/>
+                    <Form.Item label="Reference" name="reference">
+                        <Input type="text" />
                     </Form.Item>
-                    <Form.Item label='Date' name='date'>
-                        <Input type='date'/>
+                    <Form.Item label="Date" name="date">
+                        <Input type="date" />
                     </Form.Item>
-                    <div className='d-flex justify-content-center'>
-                        <button type='submit' className='btn btn-primary' >SAVE</button>
+                    <div className="d-flex justify-content-center">
+                        <button type="submit" className="btn btn-primary">
+                            SAVE
+                        </button>
                     </div>
-                    
                 </Form>
             </Modal>
+           
         </Layout>
+    );
+};
 
-    )
-}
-
-export default Homepage
+export default Homepage;

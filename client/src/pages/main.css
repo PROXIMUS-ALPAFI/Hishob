@@ -1,0 +1,8 @@
+.row-income {
+    background-color: #288a6a; /* Light green */
+    font-size: medium
+}
+.row-expense {
+    background-color: rgb(245, 175, 63); /* Light red */
+    font-size: medium
+}

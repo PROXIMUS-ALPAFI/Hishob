@@ -12,7 +12,7 @@ const Login = () => {
       setLoading(true);
       const { data } = await axios.post("/users/login", values);
       setLoading(false);
-      message.success("login success");
+      //message.success("login success");
       localStorage.setItem(
         "user",
         JSON.stringify({ ...data.user, password: "" })
@@ -20,7 +20,7 @@ const Login = () => {
       navigate("/");
     } catch (error) {
       setLoading(false);
-      message.error("something went wrong");
+      //message.error("something went wrong");
     }
   };
 
