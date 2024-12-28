@@ -5,6 +5,7 @@
 }
 .content{
     height: 85vh;
+    display: inline;
 }
 /* .navbar{
     background: #1d98a689 !important;
@@ -28,3 +29,17 @@
     padding: 15px 20px;
     box-shadow: 0 0 3px grey;
 }
+
+.activei{
+    color: yellowgreen;
+}
+.inactivei{
+    color: rgb(0, 72, 255);
+}
+.footer {
+    display: flex;
+    margin-top: auto;
+    
+  }
+
+

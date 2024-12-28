@@ -3,8 +3,10 @@ import { message, Form, Input, Modal, Select, Table, DatePicker } from 'antd';
 import Layout from '../components/layouts/layout';
 import axios from 'axios';
 import Loading from '../components/loading';
-import './main.css'
+import './main.css';
+import {UnorderedListOutlined,AreaChartOutlined} from '@ant-design/icons';
 import moment from 'moment';
+import Analytics from '../components/Analytics';
 const { RangePicker } = DatePicker;
 
 const Homepage = () => {
@@ -14,6 +16,7 @@ const Homepage = () => {
     const [frequency, setFrequency] = useState('7');
     const [selectDate, setselectDate] = useState([]);
     const [type,setype]=useState('ALL')
+    const [viewdata,setviewdata]=useState('table')
 
     // Table columns
     const column = [
@@ -94,6 +97,7 @@ const Homepage = () => {
     return (
         <Layout>
             {loading && <Loading />}
+            
             <div className="filters">
                 <div>
                     <h6>Select Frequency</h6>
@@ -115,6 +119,10 @@ const Homepage = () => {
                         <Select.Option value="Expense">Expense</Select.Option>
                     </Select>
                 </div>
+                <div className='mx-2'>
+                    <UnorderedListOutlined className={`mx-2 ${viewdata==='table'?'inactivei':'activei'}`} onClick={()=>setviewdata('table')}/>
+                    <AreaChartOutlined className={`mx-2 ${viewdata==='Analytics'?'inactivei':'activei'}`} onClick={()=>setviewdata('Analytics')}/>
+                </div>
                 <div>
                     <button className="btn btn-primary" onClick={() => setShowModal(true)}>
                         Add New
@@ -122,11 +130,16 @@ const Homepage = () => {
                 </div>
             </div>
             <div className="content">
+                {viewdata==='table'?
                 <Table
                     columns={column}
                     dataSource={allts}
                     rowClassName={rowClassName}
                 />
+                :
+                    <Analytics allts={allts}/>
+                }
+                
             </div>
             <Modal
                 title="Add Transaction"
