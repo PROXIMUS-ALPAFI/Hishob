@@ -1,8 +1,27 @@
 .row-income {
     background-color: #288a6a; /* Light green */
-    font-size: medium
+    font-size: medium;
 }
+
 .row-expense {
     background-color: rgb(245, 175, 63); /* Light red */
-    font-size: medium
+    font-size: medium;
+}
+
+.row-income:hover {
+    background-color: aqua;
+    
+}
+
+.row-expense:hover {
+    background-color: chocolate;
+}
+.row-income:focus-visible {
+    background-color: aqua;
+    animation-duration: 10s;
+}
+
+.row-expense:focus-visible {
+    background-color: chocolate;
+    animation-duration: 10s;
 }

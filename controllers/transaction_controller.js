@@ -34,5 +34,24 @@ const  addts=async(req,res)=>{
         res.status(500).json(error)
     }
 };
-
-module.exports  ={getallts,addts};
+const editts=async(req,res)=>{
+    try {
+        await transaction_model.findOneAndUpdate({_id:req.body.trs_id},req.body.payload);
+        res.status(200).send('edit is a success')
+    } 
+    catch (error) {
+        console.log(error);
+        res.status(500).json(error)
+    }
+}
+const delts=async(req,res)=>{
+    try {
+        await transaction_model.findOneAndDelete({_id:req.body.trs_id});
+        res.status(200).send('deletion is a success')
+    } 
+    catch (error) {
+        console.log(error);
+        res.status(500).json(error)
+    }
+}
+module.exports  ={getallts,addts,editts,delts};

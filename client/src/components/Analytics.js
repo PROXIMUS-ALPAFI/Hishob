@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Progress } from 'antd';
+
 const Analytics = ({ allts }) => {
     const categories = [
         "Salary",
@@ -102,7 +103,7 @@ const Analytics = ({ allts }) => {
                                 <div className='card'>
                                     <div className='card-body'>
                                         <h5>{categoryl}</h5>
-                                        <Progress percent={((amount/exp_turn)*100).toFixed(0)}/>
+                                        <Progress percent={((amount/exp_turn)*100).toFixed(0)} strokeColor={'red'}/>
                                     </div>
                                 </div>
                                 </>

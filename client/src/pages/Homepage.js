@@ -4,7 +4,7 @@ import Layout from '../components/layouts/layout';
 import axios from 'axios';
 import Loading from '../components/loading';
 import './main.css';
-import {UnorderedListOutlined,AreaChartOutlined} from '@ant-design/icons';
+import { UnorderedListOutlined, AreaChartOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import Analytics from '../components/Analytics';
 const { RangePicker } = DatePicker;
@@ -15,8 +15,9 @@ const Homepage = () => {
     const [allts, setallts] = useState([]);
     const [frequency, setFrequency] = useState('7');
     const [selectDate, setselectDate] = useState([]);
-    const [type,setype]=useState('ALL')
-    const [viewdata,setviewdata]=useState('table')
+    const [type, setype] = useState('ALL')
+    const [viewdata, setviewdata] = useState('table')
+    const [editable, setEditable] = useState(null)
 
     // Table columns
     const column = [
@@ -47,6 +48,19 @@ const Homepage = () => {
         },
         {
             title: 'Action',
+            render: (text, record) => (
+                <div>
+                    <EditOutlined className='mx-2'
+                        onClick={() => {
+                            setEditable(record)
+                            setShowModal(true)
+                        }}
+                    />
+                    <DeleteOutlined className='mx-2'
+                        onClick={() => { hd(record) }}
+                    />
+                </div>
+            )
         },
     ];
 
@@ -69,20 +83,51 @@ const Homepage = () => {
             }
         };
         getallts();
-    }, [frequency, selectDate,type]);
+    }, [frequency, selectDate, type]);
 
     // Form submission
+    const hd = async (record) => {
+        setLoading(true)
+        try {
+            await axios.post('/transactions/delts', { trs_id: record._id })
+            setLoading(false)
+            window.location.reload();
+        } catch (error) {
+            setLoading(false)
+            console.log(error);
+        }
+    }
+
     const handlesubmit = async (value) => {
         try {
             const user = JSON.parse(localStorage.getItem('user'));
             setLoading(true);
-            await axios.post('/transactions/addts', {
-                ...value,
-                userid: user._id,
-            });
-            message.success('Transaction Loaded Successfully');
-            setLoading(false);
-            setShowModal(false);
+            if (editable) {
+                await axios.post('/transactions/editts', {
+                    payload: {
+                        ...value,
+                        userid: user._id,
+                    },
+                    trs_id: editable._id
+                });
+                message.success('Transaction updated Successfully');
+                setLoading(false);
+                setShowModal(false);
+                setEditable(null);
+                window.location.reload();
+            }
+            else {
+                await axios.post('/transactions/addts', {
+                    ...value,
+                    userid: user._id,
+                });
+                message.success('Transaction Loaded Successfully');
+                setLoading(false);
+                setShowModal(false);
+                setEditable(null);
+                window.location.reload();
+            }
+
         } catch (error) {
             setLoading(false);
             message.error('Something went wrong');
@@ -97,7 +142,7 @@ const Homepage = () => {
     return (
         <Layout>
             {loading && <Loading />}
-            
+
             <div className="filters">
                 <div>
                     <h6>Select Frequency</h6>
@@ -114,14 +159,14 @@ const Homepage = () => {
                 <div>
                     <h6>Select Type</h6>
                     <Select value={type} onChange={(values) => setype(values)}>
-                    <Select.Option value="ALL">All</Select.Option>
+                        <Select.Option value="ALL">All</Select.Option>
                         <Select.Option value="Income">Income</Select.Option>
                         <Select.Option value="Expense">Expense</Select.Option>
                     </Select>
                 </div>
                 <div className='mx-2'>
-                    <UnorderedListOutlined className={`mx-2 ${viewdata==='table'?'inactivei':'activei'}`} onClick={()=>setviewdata('table')}/>
-                    <AreaChartOutlined className={`mx-2 ${viewdata==='Analytics'?'inactivei':'activei'}`} onClick={()=>setviewdata('Analytics')}/>
+                    <UnorderedListOutlined className={`mx-2 ${viewdata === 'table' ? 'inactivei' : 'activei'}`} onClick={() => setviewdata('table')} />
+                    <AreaChartOutlined className={`mx-2 ${viewdata === 'Analytics' ? 'inactivei' : 'activei'}`} onClick={() => setviewdata('Analytics')} />
                 </div>
                 <div>
                     <button className="btn btn-primary" onClick={() => setShowModal(true)}>
@@ -130,34 +175,34 @@ const Homepage = () => {
                 </div>
             </div>
             <div className="content">
-                {viewdata==='table'?
-                <Table
-                    columns={column}
-                    dataSource={allts}
-                    rowClassName={rowClassName}
-                />
-                :
-                    <Analytics allts={allts}/>
+                {viewdata === 'table' ?
+                    <Table
+                        columns={column}
+                        dataSource={allts}
+                        rowClassName={rowClassName}
+                    />
+                    :
+                    <Analytics allts={allts} />
                 }
-                
+
             </div>
-            <Modal
-                title="Add Transaction"
+            {setShowModal && <Modal
+                title={editable ? "Edit Transaction" : "Add Transaction"}
                 open={showModal}
                 onCancel={() => setShowModal(false)}
                 footer={false}
             >
-                <Form layout="vertical" onFinish={handlesubmit}>
-                    <Form.Item label="Amount" name="amount">
+                <Form layout="vertical" onFinish={handlesubmit} initialValues={editable}>
+                    <Form.Item label="Amount" name="amount" rules={[{ required: true, message: 'Amount is Required' }]}>
                         <Input type="text" />
                     </Form.Item>
-                    <Form.Item label="Type" name="type">
+                    <Form.Item label="Type" name="type" rules={[{ required: true, message: 'Type is Required' }]}>
                         <Select>
                             <Select.Option value="Income">Income</Select.Option>
                             <Select.Option value="Expense">Expense</Select.Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item label="Category" name="category">
+                    <Form.Item label="Category" name="category" rules={[{ required: true, message: 'Category is Required' }]}>
                         <Select>
                             <Select.Option value="Salary">Salary</Select.Option>
                             <Select.Option value="Food">Food</Select.Option>
@@ -171,13 +216,13 @@ const Homepage = () => {
                             <Select.Option value="Tax">Tax</Select.Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item label="Description" name="description">
+                    <Form.Item label="Description" name="description" rules={[{ required: true, message: 'Description is Required' }]}>
                         <Input type="text" />
                     </Form.Item>
                     <Form.Item label="Reference" name="reference">
                         <Input type="text" />
                     </Form.Item>
-                    <Form.Item label="Date" name="date">
+                    <Form.Item label="Date" name="date" rules={[{ required: true, message: 'Please select a date' }]}>
                         <Input type="date" />
                     </Form.Item>
                     <div className="d-flex justify-content-center">
@@ -186,8 +231,8 @@ const Homepage = () => {
                         </button>
                     </div>
                 </Form>
-            </Modal>
-           
+            </Modal>}
+
         </Layout>
     );
 };
