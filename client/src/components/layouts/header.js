@@ -1,52 +1,49 @@
-import {message} from 'antd'
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { clearAuthSession, getStoredUser } from '../../auth';
 
+const Header = ({ theme, toggleTheme }) => {
+  const [loginUser, setLoginUser] = useState('');
+  const navigate = useNavigate();
 
-import React, { useEffect, useState } from 'react'
-import { Link,useNavigate } from 'react-router-dom'
-
-const Header = () => {
-    const [loginUser, setLoginUser] = useState('')
-    const navigate=useNavigate()
-    useEffect(() => {
-        const users = JSON.parse(localStorage.getItem('user'))
-        if (users) {
-            setLoginUser(users)
-        }
-    }, [])
-
-    const Logout_handler=()=>{
-        localStorage.removeItem('user')
-        message.success("Logged out")
-        navigate('/login')
+  useEffect(() => {
+    const user = getStoredUser();
+    if (user) {
+      setLoginUser(user);
     }
-    return (
-        <>
-            <nav className="navbar navbar-expand-lg bg-body-tertiary">
-                <div className="container-fluid">
-                    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
-                        <span className="navbar-toggler-icon" />
-                    </button>
-                    <div className="collapse navbar-collapse" id="navbarTogglerDemo01">
-                        <Link className="navbar-brand" to="/">Hishob</Link>
-                        <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
-                            <li className="nav-item">
-                                <p className='nav-link active'> {loginUser && loginUser.name} </p>
+  }, []);
 
-                            </li>
-                            <li className="nav-item">
-                                <button className='btn btn-primary' onClick={Logout_handler}>
-                                    Logout 
-                                </button>
-                            </li>
+  const logoutHandler = () => {
+    clearAuthSession();
+    navigate('/login');
+  };
 
+  return (
+    <header className="app-header">
+      <div className="app-header__inner">
+        <Link className="app-brand" to="/">
+          <span className="app-brand__badge">H</span>
+          <div>
+            <strong>Hishob</strong>
+            <p className="app-brand__tagline">Track money without the clutter</p>
+          </div>
+        </Link>
 
-                        </ul>
-                    </div>
-                </div>
-            </nav>
+        <div className="app-header__actions">
+          <button className="btn app-btn app-btn--theme" onClick={toggleTheme}>
+            {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          </button>
+          <div className="app-user-chip">
+            <span className="app-user-chip__label">Signed in as</span>
+            <strong>{loginUser?.name || 'Guest'}</strong>
+          </div>
+          <button className="btn app-btn app-btn--ghost" onClick={logoutHandler}>
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+};
 
-        </>
-    )
-}
-
-export default Header
+export default Header;

@@ -1,53 +1,97 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
+import { isAuthenticated } from "../auth";
 import Loading from "../components/loading";
-const Register = () => {
+
+const Register = ({ theme, toggleTheme }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  //from submit
+  const [messageApi, messageContextHolder] = message.useMessage();
+
   const submitHandler = async (values) => {
     try {
       setLoading(true);
-      await axios.post("/users/register", values);
-      message.success("Registeration Successfull");
+      const { data } = await api.post("/users/register", values);
+      messageApi.success(data.message || "Registration successful");
       setLoading(false);
       navigate("/login");
     } catch (error) {
       setLoading(false);
-      message.error("something went wrong");
+      messageApi.error(error.response?.data?.message || "Unable to create your account");
     }
   };
 
-  //prevent for login user
   useEffect(() => {
-    if (localStorage.getItem("user")) {
+    if (isAuthenticated()) {
       navigate("/");
     }
   }, [navigate]);
   return (
-    <>
-      <div className="registerp ">
+      <div className="auth-page">
+        {messageContextHolder}
         {loading && <Loading />}
-        <Form layout="vertical" onFinish={submitHandler}>
-          <h1>Register Form</h1>
-          <Form.Item label="Name" name="name">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Email" name="email">
-            <Input type="email" />
-          </Form.Item>
-          <Form.Item label="Password" name="password">
-            <Input type="password" />
-          </Form.Item>
-          <div className="d-flex justify-content-between">
-            <Link to="/login">Already Register ? Cleck Here to login</Link>
-            <button className="btn btn-primary">Resgiter</button>
-          </div>
-        </Form>
+        <button className="auth-theme-toggle" type="button" onClick={toggleTheme}>
+          {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+        </button>
+        <div className="auth-card">
+          <section className="auth-card__hero">
+            <div>
+              <span className="auth-card__eyebrow">Start tracking today</span>
+              <h1>Build a cleaner money routine.</h1>
+            </div>
+            <div>
+              <p>Create an account to log transactions and understand spending patterns at a glance.</p>
+              <ul>
+                <li>Organize income and expenses</li>
+                <li>Filter by time period and type</li>
+                <li>Review clear income and expense summaries</li>
+              </ul>
+            </div>
+          </section>
+
+          <section className="auth-card__form">
+            <h2>Create account</h2>
+            <p className="auth-card__form-copy">Set up your Hishob workspace in less than a minute.</p>
+            <Form layout="vertical" onFinish={submitHandler} autoComplete="off">
+              <Form.Item
+                label="Name"
+                name="name"
+                rules={[{ required: true, message: "Name is required" }]}
+              >
+                <Input placeholder="Your full name" size="large" />
+              </Form.Item>
+              <Form.Item
+                label="Email"
+                name="email"
+                rules={[
+                  { required: true, message: "Email is required" },
+                  { type: "email", message: "Enter a valid email address" },
+                ]}
+              >
+                <Input type="email" placeholder="name@example.com" size="large" />
+              </Form.Item>
+              <Form.Item
+                label="Password"
+                name="password"
+                rules={[
+                  { required: true, message: "Password is required" },
+                  { min: 6, message: "Password must be at least 6 characters" },
+                ]}
+              >
+                <Input.Password placeholder="Create a secure password" size="large" />
+              </Form.Item>
+              <button className="auth-card__submit" type="submit">
+                Register
+              </button>
+            </Form>
+            <p className="auth-card__switch">
+              Already registered? <Link to="/login">Log in here</Link>
+            </p>
+          </section>
+        </div>
       </div>
-    </>
   );
 };
 

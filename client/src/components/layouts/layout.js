@@ -1,18 +1,15 @@
+import Header from './header';
+import Footer from './footer';
+import '../../index.css';
 
-import Header from './header'
-import Footer from './footer'
-import '../../index.css'
-
-const Layout = ({children}) => {
+const Layout = ({ children, theme, toggleTheme }) => {
   return (
-    <>
-       <Header/>
-       <div className='content'>
-            {children}
-       </div>
-       <Footer/>
-    </>
-  )
-}
+    <div className="app-shell">
+      <Header theme={theme} toggleTheme={toggleTheme} />
+      <main className="app-main">{children}</main>
+      <Footer />
+    </div>
+  );
+};
 
-export default Layout
+export default Layout;

@@ -20,9 +20,6 @@ const transaction_schema = new mongoose.Schema({
         type: String,
         required: [true, 'description is Required']
     },
-    reference: {
-        type: String,
-    },
     date: {
         type: Date,
         required: [true, 'date is Required']

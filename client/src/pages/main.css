@@ -1,27 +1,482 @@
 .row-income {
-    background-color: #288a6a; /* Light green */
+    background-color: rgba(34, 197, 94, 0.08);
     font-size: medium;
 }
 
 .row-expense {
-    background-color: rgb(245, 175, 63); /* Light red */
+    background-color: rgba(239, 68, 68, 0.08);
     font-size: medium;
 }
 
 .row-income:hover {
-    background-color: aqua;
-    
+    background-color: rgba(34, 197, 94, 0.14) !important;
 }
 
 .row-expense:hover {
-    background-color: chocolate;
+    background-color: rgba(239, 68, 68, 0.14) !important;
 }
+
 .row-income:focus-visible {
-    background-color: aqua;
-    animation-duration: 10s;
+    background-color: rgba(34, 197, 94, 0.14);
 }
 
 .row-expense:focus-visible {
-    background-color: chocolate;
-    animation-duration: 10s;
+    background-color: rgba(239, 68, 68, 0.14);
+}
+
+.table-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.table-icon-button {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 10px;
+    background: #e0e7ff;
+    color: #3730a3;
+    display: grid;
+    place-items: center;
+}
+
+body.theme-dark .table-icon-button {
+    background: rgba(55, 65, 81, 0.92);
+    color: #c7d2fe;
+}
+
+body.theme-dark .table-icon-button--danger {
+    background: rgba(127, 29, 29, 0.85);
+    color: #fecaca;
+}
+
+.table-icon-button--danger {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.type-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 84px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.type-pill--income {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.type-pill--expense {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.filter-summary {
+    min-height: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    color: #475569;
+    font-weight: 500;
+}
+
+.view-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.time-view-switcher {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.time-view-switcher__button {
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: rgba(255, 255, 255, 0.8);
+    color: #475569;
+    padding: 10px 14px;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.time-view-switcher__button--active {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    border-color: transparent;
+    color: #ffffff;
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.18);
+}
+
+body.theme-dark .time-view-switcher__button {
+    background: rgba(15, 23, 42, 0.9);
+    color: #cbd5e1;
+    border-color: rgba(148, 163, 184, 0.18);
+}
+
+.transaction-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.transaction-card {
+    padding: 18px;
+    border-radius: 20px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: linear-gradient(180deg, #ffffff, #f8fafc);
+}
+
+body.theme-dark .transaction-card {
+    background: linear-gradient(180deg, #111827, #0f172a);
+    border-color: rgba(148, 163, 184, 0.14);
+}
+
+.transaction-card--income {
+    box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.14);
+}
+
+.transaction-card--expense {
+    box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.14);
+}
+
+.transaction-card__top,
+.transaction-card__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.transaction-card__identity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.transaction-card__icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 1rem;
+}
+
+.transaction-card__icon--income {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.transaction-card__icon--expense {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+body.theme-dark .transaction-card__icon--income {
+    background: rgba(20, 83, 45, 0.86);
+    color: #86efac;
+}
+
+body.theme-dark .transaction-card__icon--expense {
+    background: rgba(127, 29, 29, 0.86);
+    color: #fca5a5;
+}
+
+.transaction-card h4 {
+    margin: 16px 0 6px;
+    font-size: 1.05rem;
+}
+
+.transaction-card p {
+    margin: 0 0 14px;
+    color: #64748b;
+}
+
+.transaction-card__date {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+}
+
+body.theme-dark .transaction-card p {
+    color: #9fb0ca;
+}
+
+body.theme-dark .transaction-card__date {
+    color: #bfd0eb;
+}
+
+.empty-state {
+    padding: 20px;
+    border-radius: 18px;
+    background: #f8fafc;
+    color: #64748b;
+}
+
+.analytics-grid {
+    display: grid;
+    gap: 18px;
+}
+
+.analytics-grid--top {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 18px;
+}
+
+.analytics-grid--details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.analytics-card {
+    padding: 22px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 22px;
+    background: linear-gradient(180deg, #ffffff, #f8fbff);
+}
+
+.analytics-card__header {
+    margin-bottom: 18px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.analytics-card__title {
+    display: grid;
+    gap: 6px;
+}
+
+.analytics-card__icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    font-size: 1.1rem;
+}
+
+.analytics-card__icon--mix,
+.analytics-card__icon--turnover {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.analytics-card__icon--income {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.analytics-card__icon--expense {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+body.theme-dark .analytics-card__icon--mix,
+body.theme-dark .analytics-card__icon--turnover {
+    background: rgba(49, 46, 129, 0.88);
+    color: #c7d2fe;
+}
+
+body.theme-dark .analytics-card__icon--income {
+    background: rgba(20, 83, 45, 0.86);
+    color: #86efac;
+}
+
+body.theme-dark .analytics-card__icon--expense {
+    background: rgba(127, 29, 29, 0.86);
+    color: #fca5a5;
+}
+
+.analytics-card__eyebrow {
+    margin-bottom: 6px;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6366f1;
+}
+
+.analytics-card__header h3 {
+    margin: 0;
+}
+
+.analytics-card__body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.analytics-metrics h5 {
+    margin-bottom: 10px;
+}
+
+.analytics-progress-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.analytics-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.analytics-list__item {
+    padding: 14px;
+    border-radius: 16px;
+    background: #f8fafc;
+}
+
+.analytics-list__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.analytics-list__row h5,
+.analytics-list__row span {
+    margin: 0;
+}
+
+.analytics-card__controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.analytics-mode-toggle {
+    display: inline-flex;
+    padding: 4px;
+    border-radius: 14px;
+    background: #eef2ff;
+    gap: 4px;
+}
+
+.analytics-mode-toggle__button {
+    border: none;
+    background: transparent;
+    color: #475569;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.analytics-mode-toggle__button--active {
+    background: #ffffff;
+    color: #1e293b;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+body.theme-dark .analytics-card,
+body.theme-dark .analytics-list__item {
+    background: linear-gradient(180deg, #111827, #0f172a);
+    border-color: rgba(148, 163, 184, 0.14);
+}
+
+body.theme-dark .analytics-mode-toggle {
+    background: #172036;
+}
+
+body.theme-dark .analytics-mode-toggle__button {
+    color: #cbd5e1;
+}
+
+body.theme-dark .analytics-mode-toggle__button--active {
+    background: #334155;
+    color: #f8fafc;
+}
+
+.analytics-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.analytics-bar__track {
+    flex: 1;
+    min-width: 0;
+    height: 12px;
+    border-radius: 999px;
+    background: #cbd5e1;
+    overflow: hidden;
+}
+
+.analytics-bar__fill {
+    height: 100%;
+    min-width: 10px;
+    border-radius: 999px;
+}
+
+.analytics-bar__fill--income {
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+}
+
+.analytics-bar__fill--expense {
+    background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.analytics-bar__label {
+    min-width: 40px;
+    text-align: right;
+    font-weight: 600;
+    color: #475569;
+}
+
+body.theme-dark .analytics-bar__track {
+    background: #334155;
+}
+
+body.theme-dark .analytics-bar__label {
+    color: #cbd5e1;
+}
+
+@media (max-width: 767px) {
+    .view-toolbar,
+    .transaction-card__meta {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .analytics-grid--top,
+    .analytics-grid--details {
+        grid-template-columns: 1fr;
+    }
+
+    .transaction-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .analytics-card__header {
+        flex-direction: column;
+    }
+
+    .analytics-card__controls {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 991px) {
+    .transaction-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
