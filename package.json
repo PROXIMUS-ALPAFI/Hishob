@@ -44,6 +44,10 @@
   "build": {
     "appId": "com.devarshnaik.hishob",
     "productName": "Hishob",
+    "icon": "hishob_fav.png",
+    "extraResources": [
+      ".env"
+    ],
     "files": [
       "electron/**/*",
       "client/build/**/*",

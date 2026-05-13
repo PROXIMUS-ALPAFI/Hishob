@@ -1,11 +1,16 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const morgan = require("morgan");
 const dotenv = require("dotenv");
 const connectdb = require("./config/connectdb");
 const securityHeaders = require('./middleware/securityHeaders');
 
-dotenv.config();
+const envPath = process.resourcesPath
+    ? path.join(process.resourcesPath, '.env')
+    : undefined;
+
+dotenv.config(envPath ? { path: envPath } : {});
 
 let dbConnectionPromise;
 
