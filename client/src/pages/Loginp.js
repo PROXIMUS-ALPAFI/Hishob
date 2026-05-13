@@ -16,12 +16,16 @@ const Login = ({ theme, toggleTheme }) => {
       const { data } = await api.post("/users/login", values);
       setLoading(false);
       setAuthSession({ user: data.user, token: data.token });
-      messageApi.success(data.message || "Welcome back");
+      messageApi.success(`Welcome back, ${data.user.name || data.user.email}`);
       navigate("/");
     } catch (error) {
       setLoading(false);
       messageApi.error(error.response?.data?.message || "Unable to log in with those details");
     }
+  };
+
+  const onFinishFailed = () => {
+    messageApi.warning("Please fix the form errors before continuing.");
   };
 
   useEffect(() => {
@@ -55,7 +59,7 @@ const Login = ({ theme, toggleTheme }) => {
           <section className="auth-card__form">
             <h2>Login</h2>
             <p className="auth-card__form-copy">Use your account details to continue to Hishob.</p>
-            <Form layout="vertical" onFinish={submitHandler} autoComplete="off">
+            <Form layout="vertical" onFinish={submitHandler} onFinishFailed={onFinishFailed} autoComplete="off">
               <Form.Item
                 label="Email"
                 name="email"

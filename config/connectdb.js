@@ -10,7 +10,9 @@ const conectdb = async()=>{
             return mongoose.connection;
         }
 
-        await mongoose.connect(process.env.MONGODB_URL)
+        await mongoose.connect(process.env.MONGODB_URL, {
+            serverSelectionTimeoutMS: 5000,
+        })
         console.log(`server running on port ${mongoose.connection.host}`.bgCyan);
         return mongoose.connection;
     } catch (err) {

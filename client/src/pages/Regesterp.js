@@ -14,13 +14,17 @@ const Register = ({ theme, toggleTheme }) => {
     try {
       setLoading(true);
       const { data } = await api.post("/users/register", values);
-      messageApi.success(data.message || "Registration successful");
+      messageApi.success(`Account created! Welcome, ${data.user.name}`);
       setLoading(false);
       navigate("/login");
     } catch (error) {
       setLoading(false);
       messageApi.error(error.response?.data?.message || "Unable to create your account");
     }
+  };
+
+  const onFinishFailed = () => {
+    messageApi.warning("Please fix the form errors before continuing.");
   };
 
   useEffect(() => {
@@ -54,7 +58,7 @@ const Register = ({ theme, toggleTheme }) => {
           <section className="auth-card__form">
             <h2>Create account</h2>
             <p className="auth-card__form-copy">Set up your Hishob workspace in less than a minute.</p>
-            <Form layout="vertical" onFinish={submitHandler} autoComplete="off">
+            <Form layout="vertical" onFinish={submitHandler} onFinishFailed={onFinishFailed} autoComplete="off">
               <Form.Item
                 label="Name"
                 name="name"

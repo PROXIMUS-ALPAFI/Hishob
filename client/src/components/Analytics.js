@@ -1,15 +1,39 @@
 import React, { useEffect, useState } from 'react';
-
+import moment from 'moment';
 import { Progress } from 'antd';
-import { ArrowDownOutlined, ArrowUpOutlined, BarChartOutlined, PieChartOutlined, WalletOutlined } from '@ant-design/icons';
+import { ArrowDownOutlined, ArrowUpOutlined, BarChartOutlined, PieChartOutlined, WalletOutlined, CalendarOutlined, TagsOutlined } from '@ant-design/icons';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const expenseCategories = ['Food', 'Entertainment', 'Travel', 'Utilities', 'Groceries', 'Products', 'Savings'];
 const incomeCategories = ['Salary', 'Dividend', 'Gift'];
 const formatCurrency = (amount) => `Rs. ${Number(amount || 0).toLocaleString('en-IN')}`;
 
-const Analytics = ({ allts, initialChartView = 'progress' }) => {
+const groupOptions = [
+    { value: 'month', label: 'Month', icon: <CalendarOutlined /> },
+    { value: 'year', label: 'Year', icon: <CalendarOutlined /> },
+    { value: 'category', label: 'Category', icon: <TagsOutlined /> },
+];
+
+const getGroupKey = (trs, groupBy) => {
+    const d = moment(trs.date);
+    if (groupBy === 'month') return d.format('MMM YYYY');
+    if (groupBy === 'year') return d.format('YYYY');
+    return trs.category || 'Other';
+};
+
+const sortGroups = (groups, groupBy) => {
+    if (groupBy === 'category') return groups;
+    return groups.sort((a, b) => {
+        if (a.label < b.label) return -1;
+        if (a.label > b.label) return 1;
+        return 0;
+    });
+};
+
+const Analytics = ({ allts, initialChartView = 'progress', theme }) => {
     const [mode, setMode] = useState('Expense');
     const [chartView, setChartView] = useState(initialChartView);
+    const [groupBy, setGroupBy] = useState('month');
 
     useEffect(() => {
         setChartView(initialChartView);
@@ -24,7 +48,6 @@ const Analytics = ({ allts, initialChartView = 'progress' }) => {
     const num_exp = allts.filter((transaction) => transaction.type === 'Expense');
     const inc_perc = (num_inc.length / num_trs) * 100;
     const exp_perc = (num_exp.length / num_trs) * 100;
-    const total_turn = allts.reduce((acc, trs) => acc + Number(trs.amount || 0), 0)
 
     const inc_turn = allts.filter(
         (trs) => trs.type === "Income"
@@ -34,8 +57,12 @@ const Analytics = ({ allts, initialChartView = 'progress' }) => {
         (trs) => trs.type !== "Income"
     ).reduce((acc, trs) => acc + Number(trs.amount || 0), 0)
 
-    const inct_perc = total_turn ? (inc_turn / total_turn) * 100 : 0
-    const expt_perc = total_turn ? (exp_turn / total_turn) * 100 : 0
+    const total_turn = inc_turn - exp_turn;
+    const total_flow = inc_turn + exp_turn;
+
+    const inct_perc = total_flow ? (inc_turn / total_flow) * 100 : 0;
+    const expt_perc = total_flow ? (exp_turn / total_flow) * 100 : 0;
+
     const selectedCategories = mode === 'Income' ? incomeCategories : expenseCategories;
     const selectedTransactions = allts.filter((trs) => trs.type === mode);
     const selectedTurnover = mode === 'Income' ? inc_turn : exp_turn;
@@ -55,6 +82,19 @@ const Analytics = ({ allts, initialChartView = 'progress' }) => {
             };
         })
         .filter((item) => item.amount > 0);
+
+    const groupedData = sortGroups(
+        Object.values(
+            allts.reduce((acc, trs) => {
+                const key = getGroupKey(trs, groupBy);
+                if (!acc[key]) acc[key] = { label: key, income: 0, expense: 0 };
+                if (trs.type === 'Income') acc[key].income += Number(trs.amount || 0);
+                else acc[key].expense += Number(trs.amount || 0);
+                return acc;
+            }, {})
+        ),
+        groupBy
+    );
 
     return (
         <>
@@ -83,7 +123,7 @@ const Analytics = ({ allts, initialChartView = 'progress' }) => {
                         <div className="analytics-card__title">
                             <span className="analytics-card__icon analytics-card__icon--turnover"><WalletOutlined /></span>
                             <p className="analytics-card__eyebrow">Money distribution</p>
-                            <h3>Total Turnover: {formatCurrency(total_turn)}</h3>
+                            <h3>Net Turnover: {formatCurrency(total_turn)}</h3>
                         </div>
                     </div>
                     <div className="analytics-card__body">
@@ -114,14 +154,14 @@ const Analytics = ({ allts, initialChartView = 'progress' }) => {
                                 <h5>Total income</h5>
                                 <span>{formatCurrency(inc_turn)}</span>
                             </div>
-                            <Progress percent={Number(inc_perc.toFixed(0))} />
+                            <Progress percent={Number(inct_perc.toFixed(0))} strokeColor="#16a34a" />
                         </div>
                         <div className='analytics-list__item'>
                             <div className='analytics-list__row'>
                                 <h5>Income entries</h5>
                                 <span>{num_inc.length}</span>
                             </div>
-                            <Progress percent={Number(inc_perc.toFixed(0))} />
+                            <Progress percent={Number(inc_perc.toFixed(0))} strokeColor="#16a34a" />
                         </div>
                     </div>
                 </div>
@@ -131,8 +171,14 @@ const Analytics = ({ allts, initialChartView = 'progress' }) => {
                             <span className={`analytics-card__icon analytics-card__icon--${mode.toLowerCase()}`}>
                                 {mode === 'Income' ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
                             </span>
-                            <p className="analytics-card__eyebrow">Category Analytics</p>
-                            <h3>{mode} breakdown</h3>
+                            <p className="analytics-card__eyebrow">
+                                {chartView === 'bars' ? 'Income vs Expense' : 'Category Analytics'}
+                            </p>
+                            <h3>
+                                {chartView === 'bars'
+                                    ? `Comparison by ${groupBy}`
+                                    : `${mode} breakdown`}
+                            </h3>
                         </div>
                         <div className="analytics-card__controls">
                             <div className="analytics-mode-toggle">
@@ -148,74 +194,110 @@ const Analytics = ({ allts, initialChartView = 'progress' }) => {
                                     onClick={() => setChartView('bars')}
                                     type="button"
                                 >
-                                    <BarChartOutlined /> Bars
+                                    <BarChartOutlined /> Compare
                                 </button>
                             </div>
-                            <div className="analytics-mode-toggle">
-                            <button
-                                className={`analytics-mode-toggle__button ${mode === 'Expense' ? 'analytics-mode-toggle__button--active' : ''}`}
-                                onClick={() => setMode('Expense')}
-                                type="button"
-                            >
-                                Expense
-                            </button>
-                            <button
-                                className={`analytics-mode-toggle__button ${mode === 'Income' ? 'analytics-mode-toggle__button--active' : ''}`}
-                                onClick={() => setMode('Income')}
-                                type="button"
-                            >
-                                Income
-                            </button>
-                            </div>
+                            {chartView === 'bars' ? (
+                                <div className="analytics-mode-toggle">
+                                    {groupOptions.map((opt) => (
+                                        <button
+                                            key={opt.value}
+                                            className={`analytics-mode-toggle__button ${groupBy === opt.value ? 'analytics-mode-toggle__button--active' : ''}`}
+                                            onClick={() => setGroupBy(opt.value)}
+                                            type="button"
+                                        >
+                                            {opt.icon} {opt.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="analytics-mode-toggle">
+                                    <button
+                                        className={`analytics-mode-toggle__button ${mode === 'Expense' ? 'analytics-mode-toggle__button--active' : ''}`}
+                                        onClick={() => setMode('Expense')}
+                                        type="button"
+                                    >
+                                        Expense
+                                    </button>
+                                    <button
+                                        className={`analytics-mode-toggle__button ${mode === 'Income' ? 'analytics-mode-toggle__button--active' : ''}`}
+                                        onClick={() => setMode('Income')}
+                                        type="button"
+                                    >
+                                        Income
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className="analytics-list">
-                        <div className='analytics-list__item'>
-                            <div className='analytics-list__row'>
-                                <h5>Total {mode.toLowerCase()}</h5>
-                                <span>{formatCurrency(selectedTurnover)}</span>
-                            </div>
-                            <Progress percent={Number(selectedPercent.toFixed(0))} strokeColor={mode === 'Income' ? '#16a34a' : '#dc2626'} />
-                        </div>
-                        <div className='analytics-list__item'>
-                            <div className='analytics-list__row'>
-                                <h5>{mode} entries</h5>
-                                <span>{selectedEntryCount}</span>
-                            </div>
-                            <Progress percent={Number(selectedPercent.toFixed(0))} strokeColor={mode === 'Income' ? '#16a34a' : '#dc2626'} />
-                        </div>
-                        {categoryBreakdown.length === 0 ? (
-                            <div className='analytics-list__item'>
-                                <div className='analytics-list__row'>
-                                    <h5>No {mode.toLowerCase()} category data</h5>
-                                    <span>0</span>
-                                </div>
-                            </div>
-                        ) : categoryBreakdown.map((item) => (
-                            <div className='analytics-list__item' key={`${mode}-${item.category}`}>
-                                <div className='analytics-list__row'>
-                                    <h5>{item.category}</h5>
-                                    <span>{formatCurrency(item.amount)}</span>
-                                </div>
-                                {chartView === 'bars' ? (
-                                    <div className="analytics-bar">
-                                        <div className="analytics-bar__track">
-                                            <div
-                                                className={`analytics-bar__fill analytics-bar__fill--${mode.toLowerCase()}`}
-                                                style={{ width: `${item.percent}%` }}
-                                            />
-                                        </div>
-                                        <span className="analytics-bar__label">{item.percent}%</span>
+                        {chartView === 'bars' ? (
+                            groupedData.length === 0 ? (
+                                <div className='analytics-list__item'>
+                                    <div className='analytics-list__row'>
+                                        <h5>No data for this grouping</h5>
                                     </div>
-                                ) : (
-                                    <Progress percent={item.percent} strokeColor={mode === 'Income' ? '#16a34a' : '#dc2626'} />
-                                )}
-                            </div>
-                        ))}
+                                </div>
+                            ) : (
+                                <div className='analytics-list__item'>
+                                    <ResponsiveContainer width="100%" height={320}>
+                                        <BarChart data={groupedData} margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
+                                            <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#334155' : '#e2e8f0'} />
+                                            <XAxis dataKey="label" tick={{ fill: theme === 'dark' ? '#cbd5e1' : '#475569', fontSize: 12 }} />
+                                            <YAxis tick={{ fill: theme === 'dark' ? '#cbd5e1' : '#475569', fontSize: 12 }} />
+                                            <Tooltip
+                                                contentStyle={{
+                                                    background: theme === 'dark' ? '#1e293b' : '#fff',
+                                                    border: `1px solid ${theme === 'dark' ? '#334155' : '#e2e8f0'}`,
+                                                    color: theme === 'dark' ? '#f8fafc' : '#1e293b',
+                                                    borderRadius: 8,
+                                                }}
+                                                formatter={(value) => formatCurrency(value)}
+                                            />
+                                            <Legend wrapperStyle={{ color: theme === 'dark' ? '#cbd5e1' : '#475569', fontSize: 12 }} />
+                                            <Bar dataKey="income" fill="#16a34a" name="Income" radius={[4, 4, 0, 0]} />
+                                            <Bar dataKey="expense" fill="#dc2626" name="Expense" radius={[4, 4, 0, 0]} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            )
+                        ) : (
+                            <>
+                                <div className='analytics-list__item'>
+                                    <div className='analytics-list__row'>
+                                        <h5>Total {mode.toLowerCase()}</h5>
+                                        <span>{formatCurrency(selectedTurnover)}</span>
+                                    </div>
+                                    <Progress percent={Number(selectedPercent.toFixed(0))} strokeColor={mode === 'Income' ? '#16a34a' : '#dc2626'} />
+                                </div>
+                                <div className='analytics-list__item'>
+                                    <div className='analytics-list__row'>
+                                        <h5>{mode} entries</h5>
+                                        <span>{selectedEntryCount}</span>
+                                    </div>
+                                    <Progress percent={Number(selectedPercent.toFixed(0))} strokeColor={mode === 'Income' ? '#16a34a' : '#dc2626'} />
+                                </div>
+                                {categoryBreakdown.length === 0 ? (
+                                    <div className='analytics-list__item'>
+                                        <div className='analytics-list__row'>
+                                            <h5>No {mode.toLowerCase()} category data</h5>
+                                            <span>0</span>
+                                        </div>
+                                    </div>
+                                ) : categoryBreakdown.map((item) => (
+                                    <div className='analytics-list__item' key={`${mode}-${item.category}`}>
+                                        <div className='analytics-list__row'>
+                                            <h5>{item.category}</h5>
+                                            <span>{formatCurrency(item.amount)}</span>
+                                        </div>
+                                        <Progress percent={item.percent} strokeColor={mode === 'Income' ? '#16a34a' : '#dc2626'} />
+                                    </div>
+                                ))}
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
-
         </>
     );
 };

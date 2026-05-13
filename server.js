@@ -1,11 +1,23 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
 const morgan = require("morgan");
 const dotenv = require("dotenv");
 const connectdb = require("./config/connectdb");
 const securityHeaders = require('./middleware/securityHeaders');
 
-dotenv.config();
+const envPaths = [
+    process.resourcesPath && path.join(process.resourcesPath, '.env'),
+    path.resolve(__dirname, '.env'),
+].filter(Boolean);
+
+for (const p of envPaths) {
+    if (fs.existsSync(p)) {
+        dotenv.config({ path: p });
+        break;
+    }
+}
 
 let dbConnectionPromise;
 
