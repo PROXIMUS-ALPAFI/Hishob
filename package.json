@@ -50,6 +50,7 @@
       "controllers/**/*",
       "routers/**/*",
       "models/**/*",
+      "middleware/**/*",
       "config/**/*",
       "server.js",
       "package.json",
