@@ -13,8 +13,8 @@ const parseTransactionPayload = (payload) => ({
 });
 
 const validateTransactionPayload = (payload) => {
-    if (!payload.amount || !payload.type || !payload.category || !payload.description || !payload.date) {
-        return 'Amount, type, category, description, and date are required.';
+    if (!payload.amount || !payload.type || !payload.category || !payload.date) {
+        return 'Amount, type, category, and date are required.';
     }
 
     if (Number.isNaN(Number(payload.amount)) || Number(payload.amount) <= 0) {
@@ -181,4 +181,65 @@ const delts = async (req, res) => {
     }
 }
 
-module.exports = { getallts, addts, editts, delts };
+const exportts = async (req, res) => {
+    try {
+        const transactions = await transaction_model.find({ userid: req.user.userId }).sort({ date: -1 });
+        res.status(200).json({ success: true, transactions });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Unable to export transactions.' });
+    }
+};
+
+const importts = async (req, res) => {
+    try {
+        const { transactions } = req.body;
+        if (!Array.isArray(transactions) || transactions.length === 0) {
+            return res.status(400).json({ success: false, message: 'A non-empty array of transactions is required.' });
+        }
+
+        const validCategories = [...incomeCategories, ...expenseCategories];
+        const imported = [];
+        const errors = [];
+
+        for (let i = 0; i < transactions.length; i++) {
+            const t = transactions[i];
+            const amount = Number(t.amount);
+            if (!amount || amount <= 0 || !t.type || !t.category || !t.date) {
+                errors.push({ index: i, reason: 'Missing or invalid required fields (amount, type, category, date).' });
+                continue;
+            }
+            if (!['Income', 'Expense'].includes(t.type)) {
+                errors.push({ index: i, reason: 'Type must be Income or Expense.' });
+                continue;
+            }
+            if (!validCategories.includes(t.category)) {
+                errors.push({ index: i, reason: `Invalid category "${t.category}".` });
+                continue;
+            }
+            const doc = {
+                userid: req.user.userId,
+                amount,
+                type: t.type,
+                category: t.category,
+                description: (t.description || '').trim(),
+                date: new Date(t.date),
+            };
+            imported.push(doc);
+        }
+
+        if (imported.length > 0) {
+            await transaction_model.insertMany(imported);
+        }
+
+        res.status(201).json({
+            success: true,
+            message: `Imported ${imported.length} transaction(s) successfully.`,
+            imported: imported.length,
+            errors,
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Unable to import transactions.' });
+    }
+};
+
+module.exports = { getallts, addts, editts, delts, exportts, importts };

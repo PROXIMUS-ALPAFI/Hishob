@@ -18,7 +18,6 @@ const transaction_schema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: [true, 'description is Required']
     },
     date: {
         type: Date,
@@ -27,4 +26,3 @@ const transaction_schema = new mongoose.Schema({
 }, { timestamps: true })
 const transaction_model = mongoose.model('transctions', transaction_schema)
 module.exports=transaction_model
-

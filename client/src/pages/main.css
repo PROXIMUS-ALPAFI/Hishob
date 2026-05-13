@@ -82,7 +82,7 @@ body.theme-dark .table-icon-button--danger {
     flex-direction: column;
     justify-content: center;
     gap: 6px;
-    color: #475569;
+    color: #334155;
     font-weight: 500;
 }
 
@@ -199,18 +199,18 @@ body.theme-dark .transaction-card__icon--expense {
 
 .transaction-card p {
     margin: 0 0 14px;
-    color: #64748b;
+    color: #475569;
 }
 
 .transaction-card__date {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: #64748b;
+    color: #475569;
 }
 
 body.theme-dark .transaction-card p {
-    color: #9fb0ca;
+    color: #cbd5e1;
 }
 
 body.theme-dark .transaction-card__date {
@@ -406,48 +406,134 @@ body.theme-dark .analytics-mode-toggle__button--active {
     color: #f8fafc;
 }
 
-.analytics-bar {
+.app-header__nav {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 14px;
+    background: #eef2ff;
 }
 
-.analytics-bar__track {
-    flex: 1;
-    min-width: 0;
-    height: 12px;
-    border-radius: 999px;
-    background: #cbd5e1;
-    overflow: hidden;
+body.theme-dark .app-header__nav {
+    background: #172036;
 }
 
-.analytics-bar__fill {
-    height: 100%;
-    min-width: 10px;
-    border-radius: 999px;
-}
-
-.analytics-bar__fill--income {
-    background: linear-gradient(90deg, #22c55e, #16a34a);
-}
-
-.analytics-bar__fill--expense {
-    background: linear-gradient(90deg, #ef4444, #dc2626);
-}
-
-.analytics-bar__label {
-    min-width: 40px;
-    text-align: right;
+.app-header__nav-link {
+    padding: 8px 16px;
+    border-radius: 10px;
     font-weight: 600;
     color: #475569;
+    text-decoration: none;
+    font-size: 0.88rem;
+    transition: background 0.15s, color 0.15s;
 }
 
-body.theme-dark .analytics-bar__track {
-    background: #334155;
+.app-header__nav-link:hover {
+    color: #1e293b;
+    background: rgba(255, 255, 255, 0.7);
 }
 
-body.theme-dark .analytics-bar__label {
+.app-header__nav-link--active {
+    background: #ffffff;
+    color: #1e293b;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+body.theme-dark .app-header__nav-link {
     color: #cbd5e1;
+}
+
+body.theme-dark .app-header__nav-link:hover {
+    color: #f8fafc;
+    background: rgba(51, 65, 85, 0.6);
+}
+
+body.theme-dark .app-header__nav-link--active {
+    background: #334155;
+    color: #f8fafc;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.app-btn--file {
+    border: 1px solid rgba(99, 102, 241, 0.24);
+    background: rgba(99, 102, 241, 0.08);
+    color: #4338ca;
+    font-weight: 600;
+}
+
+body.theme-dark .app-btn--file {
+    border-color: rgba(99, 102, 241, 0.3);
+    background: rgba(99, 102, 241, 0.14);
+    color: #a5b4fc;
+}
+
+.history-summary-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 20px 0;
+}
+
+.history-summary-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+body.theme-dark .history-summary-card {
+    background: rgba(15, 23, 42, 0.7);
+    border-color: rgba(148, 163, 184, 0.14);
+}
+
+.history-summary-card__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.history-summary-card small {
+    display: block;
+    font-size: 0.78rem;
+    color: #64748b;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+body.theme-dark .history-summary-card small {
+    color: #94a3b8;
+}
+
+.history-summary-card strong {
+    font-size: 1.1rem;
+}
+
+@media (max-width: 991px) {
+    .history-summary-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 991px) {
+    .app-header__nav {
+        order: 10;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .app-header__actions {
+        flex-wrap: wrap;
+    }
 }
 
 @media (max-width: 767px) {

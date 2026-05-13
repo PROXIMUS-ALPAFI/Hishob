@@ -1,5 +1,5 @@
 const path = require('path');
-const { app, BrowserWindow, shell } = require('electron');
+const { app, BrowserWindow, shell, dialog } = require('electron');
 const { startServer } = require('../server');
 
 const API_PORT = Number(process.env.ELECTRON_API_PORT || 3960);
@@ -64,9 +64,20 @@ const createWindow = () => {
 };
 
 const boot = async () => {
-  const started = await startServer({ port: API_PORT });
-  backendServer = started.server;
-  createWindow();
+  try {
+    const started = await startServer({ port: API_PORT });
+    backendServer = started.server;
+    createWindow();
+  } catch (error) {
+    console.error('Failed to start:', error);
+    await dialog.showMessageBox({
+      type: 'error',
+      title: 'Startup Error',
+      message: 'Failed to start the application.',
+      detail: error.message,
+    });
+    app.quit();
+  }
 };
 
 app.whenReady().then(boot);

@@ -83,8 +83,8 @@ const TransactionForm = ({ editable, onSubmit }) => {
                     ))}
                 </Select>
             </Form.Item>
-            <Form.Item label="Description" name="description" rules={[{ required: true, message: 'Description is Required' }]}>
-                <Input type="text" placeholder="What was this transaction for?" />
+            <Form.Item label="Description" name="description">
+                <Input type="text" placeholder="What was this transaction for? (optional)" />
             </Form.Item>
             <Form.Item label="Date" name="date" rules={[{ required: true, message: 'Please select a date' }]}>
                 <Input type="date" />
@@ -197,7 +197,7 @@ const Homepage = ({ theme, toggleTheme }) => {
         setLoading(true)
         try {
             const { data } = await api.post('/transactions/delts', { trs_id: record._id })
-            messageApi.success(data.message || 'Transaction deleted');
+            messageApi.success(`Deleted: ${formatCurrency(record.amount)} ${record.description ? `(${record.description})` : ''}`);
             setRefreshKey((value) => value + 1);
         } catch (error) {
             messageApi.error(error.response?.data?.message || 'Unable to delete transaction');
@@ -217,7 +217,7 @@ const Homepage = ({ theme, toggleTheme }) => {
                     },
                     trs_id: editable._id
                 });
-                messageApi.success('Transaction updated successfully');
+                messageApi.success(`Transaction updated: ${formatCurrency(value.amount)}`);
                 setShowModal(false);
                 setEditable(null);
                 setRefreshKey((current) => current + 1);
@@ -226,7 +226,7 @@ const Homepage = ({ theme, toggleTheme }) => {
                 const { data } = await api.post('/transactions/addts', {
                     ...value,
                 });
-                messageApi.success(data.message || 'Transaction added successfully');
+                messageApi.success(`Transaction added: ${formatCurrency(value.amount)} ${value.description ? `(${value.description})` : ''}`);
                 setShowModal(false);
                 setEditable(null);
                 setRefreshKey((current) => current + 1);
@@ -408,8 +408,8 @@ const Homepage = ({ theme, toggleTheme }) => {
                     : viewdata === 'cards'
                         ? renderCardsView()
                         : viewdata === 'bars'
-                            ? <Analytics allts={allts} initialChartView="bars" />
-                            : <Analytics allts={allts} initialChartView="progress" />
+                            ? <Analytics allts={allts} initialChartView="bars" theme={theme} />
+                            : <Analytics allts={allts} initialChartView="progress" theme={theme} />
                 }
 
             </div>
